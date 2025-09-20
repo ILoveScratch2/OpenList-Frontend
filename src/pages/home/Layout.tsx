@@ -6,7 +6,7 @@ import { Body } from "./Body"
 import { Footer } from "./Footer"
 import { Header } from "./header/Header"
 import { Toolbar } from "./toolbar/Toolbar"
-import { createSignal, onMount } from "solid-js"
+import { onMount } from "solid-js"
 
 let announcementShown = false
 
