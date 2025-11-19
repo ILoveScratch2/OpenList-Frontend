@@ -9,6 +9,7 @@ import {
   HStack,
   Icon,
   useColorMode,
+  Button,
 } from "@hope-ui/solid"
 import { Motion } from "solid-motionone"
 import {
@@ -20,13 +21,22 @@ import {
   Match,
   Show,
   Switch,
+  Suspense,
 } from "solid-js"
-import { getMainColor, local, me, OrderBy, password } from "~/store"
+import {
+  getMainColor,
+  local,
+  me,
+  OrderBy,
+  password,
+  ObjStore,
+  objStore,
+} from "~/store"
 import { Obj, ObjTree, UserMethods, UserPermissions } from "~/types"
 import { useFetch, useRouter, useT, useUtil } from "~/hooks"
 import { ListTitle } from "~/pages/home/folder/List"
 import { cols } from "~/pages/home/folder/ListItem"
-import { Error, MaybeLoading } from "~/components"
+import { Error, FullLoading, MaybeLoading } from "~/components"
 import {
   bus,
   encodePath,
@@ -42,19 +52,16 @@ import { useSelectWithMouse } from "~/pages/home/folder/helper"
 import { getIconByObj } from "~/utils/icon"
 import createMutex from "~/utils/mutex"
 import { Item, Menu, useContextMenu } from "solid-contextmenu"
-import { TbCopy, TbLink } from "solid-icons/tb"
+import { TbCopy, TbLink, TbArrowLeft } from "solid-icons/tb"
 import { AiOutlineCloudDownload } from "solid-icons/ai"
 import { Operations } from "~/pages/home/toolbar/operations"
+import File from "../file/File"
 import "solid-contextmenu/dist/style.css"
-
-const download = (url: string) => {
-  window.open(url, "_blank")
-}
 
 type ListItemProps = {
   obj: Obj
   index: number
-  jumpCallback: () => void
+  onNavigate: () => void
   innerPath: string
   url?: string
   pass: string
@@ -86,11 +93,7 @@ const ListItem = (props: ListItemProps) => {
         }}
         cursor={!isMouseSupported() ? "pointer" : "default"}
         on:click={(_: MouseEvent) => {
-          if (props.obj.is_dir) {
-            props.jumpCallback()
-          } else if (props.url) {
-            download(props.url)
-          }
+          props.onNavigate()
         }}
         onContextMenu={(e: MouseEvent) => {
           show(e, { props: props })
@@ -113,9 +116,8 @@ const ListItem = (props: ListItemProps) => {
                 filenameStyle() === "scrollable" ? "auto" : "hidden",
               textOverflow:
                 filenameStyle() === "ellipsis" ? "ellipsis" : "unset",
-              "scrollbar-width": "none", // firefox
+              "scrollbar-width": "none",
               "&::-webkit-scrollbar": {
-                // webkit
                 display: "none",
               },
             }}
@@ -162,7 +164,9 @@ const ContextMenu = () => {
           return props.obj.is_dir
         }}
         onClick={({ props }) => {
-          download(props.url)
+          if (props.url) {
+            window.open(props.url, "_blank")
+          }
         }}
       >
         <ItemContent name="download" />
@@ -228,11 +232,13 @@ const Preview = () => {
   let raw_url = ""
   let sign = ""
   let list: List | null = null
+  let originalObjStore: typeof objStore | null = null
   const [error, setError] = createSignal("")
   const [wrongPassword, setWrongPassword] = createSignal(false)
   const [requiringPassword, setRequiringPassword] = createSignal(false)
   const [comment, setComment] = createSignal("")
   const [innerPaths, setInnerPaths] = createSignal<string[]>([])
+  const [previewingFile, setPreviewingFile] = createSignal<Obj | null>(null)
   const [orderBy, setOrderBy] = createSignal<OrderBy>()
   const [reverse, setReverse] = createSignal(false)
   const [extractFolder, setExtractFolder] = createSignal<"" | "front" | "back">(
@@ -370,98 +376,137 @@ const Preview = () => {
       }
     })
   }
+  const handleNavigate = (obj: Obj, innerPath: string, url?: string) => {
+    if (obj.is_dir) {
+      setInnerPaths(innerPaths().concat(obj.name))
+      setPreviewingFile(null)
+    } else {
+      if (!originalObjStore) {
+        originalObjStore = { ...objStore }
+      }
+      ObjStore.setObj(obj)
+      ObjStore.setRawUrl(url || "")
+      ObjStore.setProvider(objStore.provider)
+      setPreviewingFile(obj)
+    }
+  }
+
+  const handleBack = () => {
+    if (originalObjStore) {
+      ObjStore.setObj(originalObjStore.obj)
+      ObjStore.setRawUrl(originalObjStore.raw_url)
+      ObjStore.setProvider(originalObjStore.provider)
+    }
+    setPreviewingFile(null)
+  }
+
   return (
     <VStack spacing="$2" w="$full">
-      <Breadcrumb pl="$2" pr="$2" w="$full">
-        <BreadcrumbItem>
-          <BreadcrumbLink
-            currentPage={innerPaths().length === 0}
-            on:click={() => setInnerPaths([])}
-          >
-            .
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <For each={innerPaths()}>
-          {(name, i) => (
-            <BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbLink
-                currentPage={innerPaths().length === i() + 1}
-                on:click={() => setInnerPaths(innerPaths().slice(0, i() + 1))}
-              >
-                {name}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-          )}
-        </For>
-      </Breadcrumb>
-      <Switch>
-        <Match when={error() !== ""}>
-          <Error msg={error()} disableColor />
-        </Match>
-        <Match when={requiringPassword()}>
-          <Password
-            title={t("home.toolbar.archive.input_password")}
-            password={() => archive_pass}
-            setPassword={(s) => (archive_pass = s)}
-            enterCallback={() => refresh()}
-          >
-            <Show when={wrongPassword()}>
-              <Text color="$danger9">
-                {t("home.toolbar.archive.incorrect_password")}
-              </Text>
-            </Show>
-          </Password>
-        </Match>
-        <Match when={!requiringPassword() && error() === ""}>
-          <MaybeLoading loading={loading()}>
-            <VStack class="list" w="$full" spacing="$1">
-              <ListTitle sortCallback={sortObjs} disableCheckbox />
-              <For each={sortedObjs()}>
-                {(obj, i) => {
-                  let url = undefined
-                  let innerPath =
-                    (innerPaths().length > 0
-                      ? "/" + innerPaths().join("/")
-                      : "") +
-                    "/" +
-                    obj.name
-                  if (!obj.is_dir) {
-                    const hasQuery = raw_url.includes("?")
-                    url =
-                      raw_url +
-                      `${hasQuery ? "&" : "?"}inner=${encodePath(innerPath, true)}`
-                    if (archive_pass !== "") {
-                      url = url + `&pass=${encodeURIComponent(archive_pass)}`
-                    }
-                    if (sign !== "") {
-                      url = url + `&sign=${sign}`
-                    }
-                  }
-                  return (
-                    <ListItem
-                      obj={obj}
-                      index={i()}
-                      jumpCallback={() =>
-                        setInnerPaths(innerPaths().concat(obj.name))
+      <Show when={!previewingFile()}>
+        <Breadcrumb pl="$2" pr="$2" w="$full">
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              currentPage={innerPaths().length === 0}
+              on:click={() => setInnerPaths([])}
+            >
+              .
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <For each={innerPaths()}>
+            {(name, i) => (
+              <BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbLink
+                  currentPage={innerPaths().length === i() + 1}
+                  on:click={() => setInnerPaths(innerPaths().slice(0, i() + 1))}
+                >
+                  {name}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            )}
+          </For>
+        </Breadcrumb>
+      </Show>
+      <Show when={previewingFile()}>
+        <Button
+          leftIcon={<TbArrowLeft />}
+          onClick={handleBack}
+          colorScheme="neutral"
+          variant="subtle"
+        >
+          {t("global.back")}
+        </Button>
+        <Suspense fallback={<FullLoading />}>
+          <File inArchive />
+        </Suspense>
+      </Show>
+      <Show when={!previewingFile()}>
+        <Switch>
+          <Match when={error() !== ""}>
+            <Error msg={error()} disableColor />
+          </Match>
+          <Match when={requiringPassword()}>
+            <Password
+              title={t("home.toolbar.archive.input_password")}
+              password={() => archive_pass}
+              setPassword={(s) => (archive_pass = s)}
+              enterCallback={() => refresh()}
+            >
+              <Show when={wrongPassword()}>
+                <Text color="$danger9">
+                  {t("home.toolbar.archive.incorrect_password")}
+                </Text>
+              </Show>
+            </Password>
+          </Match>
+          <Match when={!requiringPassword() && error() === ""}>
+            <MaybeLoading loading={loading()}>
+              <VStack class="list" w="$full" spacing="$1">
+                <ListTitle sortCallback={sortObjs} disableCheckbox />
+                <For each={sortedObjs()}>
+                  {(obj, i) => {
+                    let url = undefined
+                    let innerPath =
+                      (innerPaths().length > 0
+                        ? "/" + innerPaths().join("/")
+                        : "") +
+                      "/" +
+                      obj.name
+                    if (!obj.is_dir) {
+                      const hasQuery = raw_url.includes("?")
+                      url =
+                        raw_url +
+                        `${hasQuery ? "&" : "?"}inner=${encodePath(innerPath, true)}`
+                      if (archive_pass !== "") {
+                        url = url + `&pass=${encodeURIComponent(archive_pass)}`
                       }
-                      innerPath={innerPath}
-                      url={url}
-                      pass={archive_pass}
-                    />
-                  )
-                }}
-              </For>
-              <ContextMenu />
-            </VStack>
-          </MaybeLoading>
-        </Match>
-      </Switch>
-      <Show when={comment() !== ""}>
-        <Divider />
-        <Text w="$full" pl="$1" pr="$1">
-          {comment()}
-        </Text>
+                      if (sign !== "") {
+                        url = url + `&sign=${sign}`
+                      }
+                    }
+                    return (
+                      <ListItem
+                        obj={obj}
+                        index={i()}
+                        onNavigate={() => handleNavigate(obj, innerPath, url)}
+                        innerPath={innerPath}
+                        url={url}
+                        pass={archive_pass}
+                      />
+                    )
+                  }}
+                </For>
+                <ContextMenu />
+              </VStack>
+            </MaybeLoading>
+          </Match>
+        </Switch>
+        <Show when={comment() !== ""}>
+          <Divider />
+          <Text w="$full" pl="$1" pr="$1">
+            {comment()}
+          </Text>
+        </Show>
       </Show>
     </VStack>
   )

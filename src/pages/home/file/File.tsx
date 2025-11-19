@@ -7,9 +7,12 @@ import { Download } from "../previews/download"
 import { OpenWith } from "./open-with"
 import { getPreviews } from "../previews"
 
-const File = () => {
+const File = (props?: { inArchive?: boolean }) => {
   const previews = createMemo(() => {
-    return getPreviews({ ...objStore.obj, provider: objStore.provider })
+    return getPreviews(
+      { ...objStore.obj, provider: objStore.provider },
+      { inArchive: props?.inArchive },
+    )
   })
   const [cur, setCur] = createSignal(previews()[0])
   return (

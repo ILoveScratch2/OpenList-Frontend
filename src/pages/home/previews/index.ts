@@ -177,6 +177,7 @@ const previews: Preview[] = [
 
 export const getPreviews = (
   file: Obj & { provider: string },
+  options?: { inArchive?: boolean },
 ): PreviewComponent[] => {
   const { searchParams, isShare } = useRouter()
   const typeOverride =
@@ -186,9 +187,14 @@ export const getPreviews = (
   const downloadPrior =
     (!isShare() && getSettingBool("preview_download_by_default")) ||
     (isShare() && getSettingBool("share_preview_download_by_default"))
-  // internal previews
+
+  const blacklist = options?.inArchive ? ["Archive Preview", "Text Editor"] : []
+
   if (!isShare() || getSettingBool("share_preview")) {
     previews.forEach((preview) => {
+      if (blacklist.includes(preview.name)) {
+        return
+      }
       if (preview.provider && !preview.provider.test(file.provider)) {
         return
       }
