@@ -48,3 +48,160 @@
 .hope-select__option {
   flex-shrink: 0;
 }
+
+/* Design by DeepSeek */
+
+.md3-elevation-1 {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 1px 3px 1px rgba(0, 0, 0, 0.15);
+}
+
+.md3-elevation-2 {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 2px 6px 2px rgba(0, 0, 0, 0.15);
+}
+
+.md3-elevation-3 {
+  box-shadow:
+    0 4px 8px 3px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.md3-elevation-4 {
+  box-shadow:
+    0 6px 10px 4px rgba(0, 0, 0, 0.15),
+    0 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+.md3-elevation-5 {
+  box-shadow:
+    0 8px 12px 6px rgba(0, 0, 0, 0.15),
+    0 4px 4px rgba(0, 0, 0, 0.3);
+}
+
+.md3-motion-emphasized {
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.md3-motion-emphasized-decelerate {
+  transition-timing-function: cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+
+.md3-motion-emphasized-accelerate {
+  transition-timing-function: cubic-bezier(0.3, 0, 0.8, 0.15);
+}
+
+.md3-motion-standard {
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.md3-surface {
+  border-radius: 16px;
+  background: var(--md3-surface, #ffffff);
+  transition:
+    box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.md3-container {
+  border-radius: 12px;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.md3-interactive {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.md3-interactive:hover {
+  background-color: rgba(103, 80, 164, 0.08);
+}
+
+.md3-interactive:active {
+  background-color: rgba(103, 80, 164, 0.12);
+  transform: scale(0.98);
+}
+
+.md3-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.md3-ripple::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(103, 80, 164, 0.3);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.md3-ripple:active::after {
+  width: 300px;
+  height: 300px;
+  opacity: 0;
+  transition:
+    width 0.6s,
+    height 0.6s,
+    opacity 0.4s;
+}
+
+.md3-headline-large {
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 40px;
+  letter-spacing: 0;
+}
+
+.md3-headline-medium {
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 36px;
+  letter-spacing: 0;
+}
+
+.md3-body-large {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+}
+
+.hope-ui-dark .md3-surface {
+  background: var(--md3-surface-dark, #1c1b1f);
+}
+
+.hope-ui-dark .md3-interactive:hover {
+  background-color: rgba(208, 188, 255, 0.08);
+}
+
+.hope-ui-dark .md3-interactive:active {
+  background-color: rgba(208, 188, 255, 0.12);
+}
+
+.hope-ui-dark .md3-elevation-1 {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    0 1px 3px 1px rgba(0, 0, 0, 0.3);
+}
+
+.hope-ui-dark .md3-elevation-2 {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    0 2px 6px 2px rgba(0, 0, 0, 0.3);
+}
+
+.hope-ui-dark .md3-elevation-3 {
+  box-shadow:
+    0 4px 8px 3px rgba(0, 0, 0, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.6);
+}

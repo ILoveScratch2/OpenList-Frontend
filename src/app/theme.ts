@@ -13,14 +13,20 @@ const theme: HopeThemeConfig = {
     Button: {
       baseStyle: {
         root: {
-          rounded: "$lg",
+          rounded: "20px",
           _active: {
-            transform: "scale(.95)",
-            transition: "0.2s",
+            transform: "scale(.97)",
+            transition: "all 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
+          },
+          _hover: {
+            boxShadow:
+              "0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15)",
+            transition: "all 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
           },
           _focus: {
             boxShadow: "unset",
           },
+          transition: "all 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
         },
       },
       defaultProps: {
@@ -39,11 +45,12 @@ const theme: HopeThemeConfig = {
     Input: {
       baseStyle: {
         input: {
-          rounded: "$lg",
+          rounded: "16px",
           _focus: {
             boxShadow: "unset",
             borderColor: "$info8",
           },
+          transition: "all 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
         },
       },
       defaultProps: {
@@ -54,13 +61,14 @@ const theme: HopeThemeConfig = {
     },
     Textarea: {
       baseStyle: {
-        rounded: "$lg",
+        rounded: "16px",
         _focus: {
           boxShadow: "unset",
           borderColor: "$info8",
         },
         resize: "vertical",
         wordBreak: "break-all",
+        transition: "all 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
       },
       defaultProps: {
         variant: "filled",
@@ -69,15 +77,18 @@ const theme: HopeThemeConfig = {
     Select: {
       baseStyle: {
         trigger: {
-          rounded: "$lg",
+          rounded: "16px",
           _focus: {
             boxShadow: "unset",
             borderColor: "$info8",
           },
+          transition: "all 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
         },
         content: {
           border: "none",
-          rounded: "$lg",
+          rounded: "12px",
+          boxShadow:
+            "0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3)",
         },
         optionIndicator: {
           color: "$info10",
@@ -107,14 +118,17 @@ const theme: HopeThemeConfig = {
     Menu: {
       baseStyle: {
         content: {
-          rounded: "$md",
+          rounded: "12px",
           minW: "unset",
           border: "unset",
+          boxShadow:
+            "0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3)",
           // py: "0",
         },
         item: {
-          rounded: "$md",
+          rounded: "8px",
           py: "$1",
+          transition: "all 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
           // mx: "0",
         },
       },
@@ -122,21 +136,25 @@ const theme: HopeThemeConfig = {
     Notification: {
       baseStyle: {
         root: {
-          rounded: "$lg",
+          rounded: "16px",
           border: "unset",
+          boxShadow:
+            "0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3)",
         },
       },
     },
     Alert: {
       baseStyle: {
         root: {
-          rounded: "$lg",
+          rounded: "16px",
+          boxShadow:
+            "0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15)",
         },
       },
     },
     Anchor: {
       baseStyle: {
-        rounded: "$lg",
+        rounded: "20px",
         px: "$1_5",
         py: "$1",
         _hover: {
@@ -146,13 +164,19 @@ const theme: HopeThemeConfig = {
         _focus: {
           boxShadow: "unset",
         },
-        _active: { transform: "scale(.95)", transition: "0.1s" },
+        _active: {
+          transform: "scale(.97)",
+          transition: "all 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
+        },
+        transition: "all 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
       },
     },
     Modal: {
       baseStyle: {
         content: {
-          rounded: "$lg",
+          rounded: "28px",
+          boxShadow:
+            "0 8px 12px 6px rgba(0, 0, 0, 0.15), 0 4px 4px rgba(0, 0, 0, 0.3)",
         },
       },
     },
