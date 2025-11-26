@@ -17,7 +17,7 @@ export const NeteaseMiniPlayer: Component = () => {
   return (
     <div
       class="netease-mini-player"
-      data-playlist-id="28575553"
+      data-playlist-id="13182167053"
       data-embed="false"
       data-position="bottom-right"
       data-lyric="true"

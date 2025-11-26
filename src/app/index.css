@@ -205,3 +205,29 @@
     0 4px 8px 3px rgba(0, 0, 0, 0.3),
     0 1px 3px rgba(0, 0, 0, 0.6);
 }
+
+/* ========================================
+   NeteaseMiniPlayer Hover Auto-Slide
+   ======================================== */
+
+[data-position="bottom-right"],
+.netease-mini-player,
+#netease-mini-player,
+div[class*="netease"][style*="fixed"][style*="bottom"],
+div[class*="nmp-"][style*="fixed"][style*="bottom"] {
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+[data-position="bottom-right"]:hover,
+.netease-mini-player:hover,
+#netease-mini-player:hover,
+div[class*="netease"][style*="fixed"][style*="bottom"]:hover,
+div[class*="nmp-"][style*="fixed"][style*="bottom"]:hover {
+  transform: translateX(-80px) !important;
+}
+
+[data-position="bottom-right"]:not(:hover),
+.netease-mini-player:not(:hover),
+#netease-mini-player:not(:hover) {
+  transform: translateX(0) !important;
+}
